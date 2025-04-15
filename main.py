@@ -68,7 +68,7 @@ def createPlayer():
     # Return the newly created player sprite
     return newPlayer
 
-def playerUpdate(player, pressed_keys):
+def playerUpdate(player, pressed_keys, pSpeed):
     """
     Move the Player sprites based on user keypresses
     Args:
@@ -77,13 +77,13 @@ def playerUpdate(player, pressed_keys):
     """
     # Move the Player's rectangle based on the keys pressed by the user
     if pressed_keys[K_UP]: # checks if the value for the K_UP key is True in the dictionary (i.e. the user pressed the up key)
-        player.rect.y -= 8
+        player.rect.y -= pSpeed
     if pressed_keys[K_DOWN]: # notice if not elif, so more than one can be pressed
-        player.rect.y+= 8
+        player.rect.y+= pSpeed
     if pressed_keys[K_LEFT]:
-        player.rect.x -= 8 
+        player.rect.x -= pSpeed
     if pressed_keys[K_RIGHT]:
-        player.rect.x += 8
+        player.rect.x += pSpeed
 
     #  Keep player on the screen
     if player.rect.left < 0:
@@ -134,7 +134,15 @@ def foodUpdate(food):
     food
     """
 
-    food.rect.move_ip(-food.speed, 0)
+    if food.rect.x > player.rect.x:
+        food.rect.move_ip(food.speed, 0)
+    else:
+        food.rect.move_ip(-food.speed, 0)
+        
+    if food.rect.y > player.rect.y:
+        food.rect.move_ip(0, food.speed)
+    else:
+        food.rect.move_ip(0, -food.speed)
 
     # if off screen, kill/destroy the object
     if food.rect.right < 0: 
@@ -259,7 +267,7 @@ while running:
         
     elif status == 'game':
         # update player position based on key presses
-        playerUpdate(player, pressed_keys)
+        playerUpdate(player, pressed_keys, 8)
       
         # Update food position
         for food in foodGrp:
