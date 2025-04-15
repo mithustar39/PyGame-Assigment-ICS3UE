@@ -57,8 +57,11 @@ def createPlayer():
     newPlayer = pygame.sprite.Sprite()
     # load the image, which returns a surface. Convert makes it faster to blit
     newPlayer.image = pygame.image.load("player.png").convert()
-    #Make a specific colour on the image transparent (white, here).
-    newPlayer.image.set_colorkey((255,255,255), RLEACCEL)
+    #Make a specific colour on the image transparent (black, here).
+    newPlayer.image.set_colorkey((0,0,0), RLEACCEL)
+    #setting size of image
+    playerSize = (250,300)
+    newPlayer.image = pygame.transform.scale(newPlayer.image, playerSize)
     # the rectangle is used for the location of an object (where to place it), but also for collisions, etc..
     # this creates with the size of the surf. Without parameters, the rect is located wherever the surf was created
     newPlayer.rect = newPlayer.image.get_rect()
@@ -72,16 +75,15 @@ def playerUpdate(player, pressed_keys):
     player (Sprite)
     pressed_keys: dictionary containing the pressed keys 
     """
-
     # Move the Player's rectangle based on the keys pressed by the user
     if pressed_keys[K_UP]: # checks if the value for the K_UP key is True in the dictionary (i.e. the user pressed the up key)
-        player.rect.move_ip(0, -5) # move_ip = move in place (x, y)
+        player.rect.y -= 8
     if pressed_keys[K_DOWN]: # notice if not elif, so more than one can be pressed
-        player.rect.move_ip(0,5)
+        player.rect.y+= 8
     if pressed_keys[K_LEFT]:
-        player.rect.move_ip(-5,0)
+        player.rect.x -= 8 
     if pressed_keys[K_RIGHT]:
-        player.rect.move_ip(5,0)
+        player.rect.x += 8
 
     #  Keep player on the screen
     if player.rect.left < 0:
@@ -108,13 +110,17 @@ def createFood():
     #  Create the new food
     food = pygame.sprite.Sprite()
     food.image = pygame.image.load("pig.png").convert() # load the image, which returns a surface. Convert makes it faster to blit
-    food.image.set_colorkey((255,255,255), RLEACCEL) # This can be used to make a specific colour on your image transparent (white, here).
+    food.image.set_colorkey((0,0,0), RLEACCEL) # This can be used to make a specific colour on your image transparent (white, here).
+
+    #changing size of image
+    foodSize = (200,100)
+    food.image = pygame.transform.scale(food.image, foodSize)
 
     # Place the abalone randomly on the screen, starting between 20-100 pixels beyond the right hand side of the screen
     food.rect = food.image.get_rect(
         center=(
-          random.randint(SCREEN_WIDTH , SCREEN_WIDTH ),
-          random.randint(SCREEN_HEIGHT, SCREEN_HEIGHT),
+          random.randint(0, SCREEN_WIDTH ),
+          random.randint(0, SCREEN_HEIGHT),
         )
     )
     # Select a random speed
@@ -194,7 +200,7 @@ screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT])
 
 #  Create a custom event for adding a new food
 ADDFOOD = pygame.USEREVENT + 1 # USEREVENT is the last kind of event that pygame reserves, so by adding 1 to this number, ADDFOOD becomes a new event with its own individual # 
-pygame.time.set_timer(ADDFOOD, 250) # this makes the ADDFOOD event happen every 250ms (4/s). We call this once, but it fires throughout the game.
+pygame.time.set_timer(ADDFOOD, 1000) # this makes the ADDFOOD event happen every 250ms (4/s). We call this once, but it fires throughout the game.
 
 # Initialize hunger status
 hungerStatus = 10
@@ -272,7 +278,7 @@ while running:
             endTimer = pygame.time.get_ticks()
 
         #  Draw the background
-        # screen.fill((0,0,0)) # solid colour option
+        screen.fill((0,0,0)) # solid colour option
 
 
         # Draw all sprites
@@ -307,6 +313,3 @@ while running:
 
 # Quit
 pygame.quit()
-
-
-
