@@ -113,14 +113,14 @@ def createFood():
     food.image.set_colorkey((0,0,0), RLEACCEL) # This can be used to make a specific colour on your image transparent (white, here).
 
     #changing size of image
-    foodSize = (200,100)
+    foodSize = (100,100)
     food.image = pygame.transform.scale(food.image, foodSize)
 
     # Place the abalone randomly on the screen, starting between 20-100 pixels beyond the right hand side of the screen
     food.rect = food.image.get_rect(
         center=(
-          random.randint(0, SCREEN_WIDTH ),
-          random.randint(0, SCREEN_HEIGHT),
+          random.randint(200, 800),
+          random.randint(200, 800),
         )
     )
     # Select a random speed
