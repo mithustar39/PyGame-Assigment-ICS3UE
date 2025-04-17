@@ -38,8 +38,9 @@ pygame.init()
 # ================== CONSTANTS =============
 
 #  Define constants for the screen width and height
-SCREEN_WIDTH = 1000
-SCREEN_HEIGHT = 1000
+infoObject = pygame.display.Info()
+SCREEN_WIDTH = infoObject.current_w
+SCREEN_HEIGHT = infoObject.current_h
 
 # ================== FUNCTIONS =============
 
@@ -60,7 +61,7 @@ def createPlayer():
     #Make a specific colour on the image transparent (black, here).
     newPlayer.image.set_colorkey((0,0,0), RLEACCEL)
     #setting size of image
-    playerSize = (250,300)
+    playerSize = (SCREEN_WIDTH/6, SCREEN_HEIGHT/5)
     newPlayer.image = pygame.transform.scale(newPlayer.image, playerSize)
     # the rectangle is used for the location of an object (where to place it), but also for collisions, etc..
     # this creates with the size of the surf. Without parameters, the rect is located wherever the surf was created
@@ -113,18 +114,19 @@ def createFood():
     food.image.set_colorkey((0,0,0), RLEACCEL) # This can be used to make a specific colour on your image transparent (white, here).
 
     #changing size of image
-    foodSize = (100,100)
+    foodSize = (SCREEN_WIDTH/16,SCREEN_HEIGHT/16)
     food.image = pygame.transform.scale(food.image, foodSize)
 
     # Place the abalone randomly on the screen, starting between 20-100 pixels beyond the right hand side of the screen
     food.rect = food.image.get_rect(
         center=(
-          random.randint(200, 800),
-          random.randint(200, 800),
+          random.randint(0, SCREEN_WIDTH),
+          random.randint(0, SCREEN_HEIGHT),
         )
     )
     # Select a random speed
-    food.speed = random.randint(1, 5)
+    food.speedy = random.randint(-5, 5)
+    food.speedx = random.randint(-5,5)
     return food
 
 def foodUpdate(food):
@@ -133,20 +135,17 @@ def foodUpdate(food):
     Args:
     food
     """
-
-    if food.rect.x > player.rect.x:
-        food.rect.move_ip(food.speed, 0)
-    else:
-        food.rect.move_ip(-food.speed, 0)
-        
-    if food.rect.y > player.rect.y:
-        food.rect.move_ip(0, food.speed)
-    else:
-        food.rect.move_ip(0, -food.speed)
-
-    # if off screen, kill/destroy the object
-    if food.rect.right < 0: 
-        food.kill()
+    food.rect.move_ip(food.speedx, food.speedy)
+    
+    #if off screen, bounce object
+    if food.rect.left < 0:
+        food.speedx *= -1
+    if food.rect.right>SCREEN_WIDTH:
+        food.speedx *= -1
+    if food.rect.top<0:
+        food.speedy *=-1
+    if food.rect.bottom>SCREEN_HEIGHT:
+        food.speedy *=-1
 
 def start(screen):
     """
