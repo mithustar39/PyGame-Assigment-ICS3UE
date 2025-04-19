@@ -69,7 +69,7 @@ pygame.time.set_timer(ADDMUD, 15000)      # spawn mud every 15 seconds
 def createPlayer():
     """
     Initializes Player surface and rectangle.
-    newPlayer.image (Surface): otter image
+    newPlayer.image (Surface): player image
     newPlayer.rect (Rectangle): rectangle placed at bottom centre of screen
     
     Returns:
@@ -107,11 +107,11 @@ def playerUpdate(player, pressed_keys, speed):
 
 def createFood():
     """
-    Returns a sprite object called food.
+    Returns a sprite object called food (pig).
     Adds an image, rectangle, and speed to the food object
-    food.image (Surface): abalone image
-    food.rect (Rectangle): initial position is randomly placed just to the right of the screen
-    food.speed (int): Random integer between 5 and 20
+    food.image (Surface): pig image
+    food.rect (Rectangle): initial position is randomly placed
+    food.speed (int): Random integer between -5 and 5
     
     Returns:
         food (Sprite)
@@ -131,9 +131,8 @@ def createFood():
 
 def foodUpdate(food):
     """
-    Updates the position of the abalone sprite, destorying it if it off screen
-    Args:
-    food
+    Updates the position of the food sprite, destorying it if in contact with player
+    Will bounce on contact with screen edge
     """
     food.rect.move_ip(food.speedx, food.speedy)
     
@@ -162,6 +161,9 @@ def createMud():
     return mud
 
 def createPowerUp():
+    """
+    Provides the player with a speed boost when collected
+    """
     pu = pygame.sprite.Sprite()
     # load & transparent‑key the image
     img = pygame.image.load("powerup.png").convert()
@@ -172,13 +174,16 @@ def createPowerUp():
     # place it at a random spot on screen
     pu.rect = img.get_rect(
         center=(
-            random.randint(0, SCREEN_WIDTH),
-            random.randint(0, SCREEN_HEIGHT)
+            random.randint(50, SCREEN_WIDTH - 50),
+            random.randint(50, SCREEN_HEIGHT - 50)
         )
     )
     return pu
 
 def createZombie():
+    """
+    On contact with player, will stun player for a set amount of time
+    """
     zb = pygame.sprite.Sprite()
     # load & set transparency
     img = pygame.image.load("zombie.png").convert()
@@ -208,7 +213,7 @@ def start(screen):
     font = pygame.font.Font('freesansbold.ttf', 32)
 
     # Create text object, with associated rectangle in centre of screen
-    text1 = font.render('Ollie the Otter is hungry', True, (255,255,255))
+    text1 = font.render('OH NO, Ellies pigs have broken out of the barn!', True, (255,255,255))
     textRect1 = text1.get_rect()
     textRect1.center = SCREEN_WIDTH/2, SCREEN_HEIGHT/2 - 45
 
@@ -216,7 +221,7 @@ def start(screen):
     text2 = font.render('Use the arrow keys to move.', True, (255,255,255))
     textRect2 = text2.get_rect()
     textRect2.center = SCREEN_WIDTH/2, SCREEN_HEIGHT/2 
-    text3 = font.render('Catch 10 Abalone to win.', True, (255,255,255))
+    text3 = font.render('There are 5 levels and you must catch the needed number of pigs.', True, (255,255,255))
     textRect3 = text3.get_rect()
     textRect3.center = SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + 45
     text4 = font.render('Press Enter to Begin.', True, (255,255,255))
@@ -241,7 +246,7 @@ def end(screen, duration):
     font = pygame.font.Font('freesansbold.ttf', 32)
 
     # Create text object, with associated rectangle in centre of screen
-    text = font.render('YOU WIN', True, (255,255,255))
+    text = font.render('YOU CAUGHT ALL OF THE PIGS!', True, (255,255,255))
     textRect = text.get_rect()
     textRect.center = SCREEN_WIDTH/2, SCREEN_HEIGHT/2
 
@@ -261,6 +266,8 @@ def end(screen, duration):
 #  Set up the drawing window
 # Returns a Surface, which represents the inside dimensions of drawing window --> the OS controls the borders & title bar, etc.
 screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT]) 
+imgbg = pygame.image.load("BG.png").convert()
+imgbg = pygame.transform.scale(imgbg, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
 # =====SPRITE GROUPS
 #  Create groups to hold food sprites and all sprites
@@ -402,8 +409,8 @@ while running:
                 endTimer = pygame.time.get_ticks()
 
         #  Draw the background
-        screen.fill((0,0,0)) # solid colour option
-
+        #screen.fill((0,0,0)) # solid colour option
+        screen.blit(imgbg, (0,0))
 
         # Draw all sprites
         # draw is a built in method. We pass the display screen, and it will draw the sprites within the group
@@ -415,12 +422,12 @@ while running:
 
         # Display the hunger level
         font = pygame.font.Font('freesansbold.ttf', 25)
-        text = font.render('Hunger: '+ str(hungerStatus), True, (255,255,255))
+        text = font.render('Catch pigs: '+ str(hungerStatus), True, (255,255,255))
         textRect = text.get_rect()
         textRect.center = SCREEN_WIDTH/2, 50
         screen.blit(text, textRect)
         txt1 = font.render(f'Level: {level}', True, (255,255,255))
-        screen.blit(txt1, (20,20))
+        screen.blit(txt1, (30,30))
         
     elif status == 'win':
         end(screen, endTimer)
